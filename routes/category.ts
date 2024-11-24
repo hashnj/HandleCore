@@ -9,7 +9,7 @@ interface Category {
     name: string;
     description: string;
     cat_img: string;
-    isSubCategory?: boolean;
+    // isSubCategory?: boolean;
     parent?: string;
 }
 
@@ -19,9 +19,11 @@ interface UpdateRequest extends Request {
 
 categoryRouter.post('/add', auth, async (req: Request, res: Response):Promise<any> => {
     const { category }: { category: Category } = req.body;
-
+    if (!category) {
+        return res.status(400).json({ error: 'Category data is missing from request body' });
+    }
     try {
-        if (category.isSubCategory) {
+        if (category.parent) {
             const result = SubCategorySchema.safeParse(category);
             if (!result.success) {
                 return res.status(400).json({ errors: result.error.errors });

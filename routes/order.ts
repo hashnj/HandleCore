@@ -1,10 +1,9 @@
 import express, { Request, Response } from 'express';
 import authenticateToken from '../middleware/auth';
-import { OrderItems, Orders, Payment, ShippingAddress, Products, Cart } from '../models'; // Adjust path as necessary
+import { OrderItems, Orders, Payment, ShippingAddress, Products, Cart } from '../models';
 
 const OrderRouter = express.Router();
 
-// Endpoint to buy a single product directly
 OrderRouter.post('/buy', authenticateToken, async (req: Request, res: Response): Promise<any> => {
   const userId: string = req.user_id;
   const { product, quantity, price, address } = req.body;
@@ -38,11 +37,10 @@ OrderRouter.post('/buy', authenticateToken, async (req: Request, res: Response):
     const payment = await Payment.create({
       order_id: newOrder._id,
       amount: totalAmount,
-      payment_method: 'Visa', // This can be dynamic in the future
+      payment_method: 'Visa',
       status: 'Paid',
     });
 
-    // Reduce product stock and save the changes
     productData.stock -= quantity;
     await productData.save();
 
@@ -58,7 +56,6 @@ OrderRouter.post('/buy', authenticateToken, async (req: Request, res: Response):
   }
 });
 
-// Endpoint to place an order for items in the cart
 OrderRouter.post('/cart', authenticateToken, async (req: Request, res: Response): Promise<any> => {
   const userId: string = req.user_id;
   const { address } = req.body;
@@ -74,7 +71,6 @@ OrderRouter.post('/cart', authenticateToken, async (req: Request, res: Response)
     const inStockItems = [];
     const outOfStockItems = [];
 
-    // Check stock for each cart item
     for (const cartItem of cart.products) {
       const product = await Products.findById(cartItem.product_id);
 
@@ -107,11 +103,10 @@ OrderRouter.post('/cart', authenticateToken, async (req: Request, res: Response)
       },
     });
 
-    // Process each in-stock item and update stock levels
     for (const cartItem of inStockItems) {
       const product = await Products.findById(cartItem.product_id);
 
-      if (!product) continue; // Handle any unexpected missing product
+      if (!product) continue; 
 
       await OrderItems.create({
         order_id: newOrder._id,
@@ -131,7 +126,6 @@ OrderRouter.post('/cart', authenticateToken, async (req: Request, res: Response)
       status: 'Paid',
     });
 
-    // Update cart to retain out-of-stock items
     cart.products = outOfStockItems;
     await cart.save();
 

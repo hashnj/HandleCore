@@ -11,7 +11,6 @@ const auth = (req: Request, res: Response, next: NextFunction): void => {
   }
 
   try {
-    // Verify the token
     const verified = jwt.verify(token, JwtSecret as string) as { id: string }; // Explicitly cast the result
     req.user_id = (verified as {id:string}).id;
     next(); 

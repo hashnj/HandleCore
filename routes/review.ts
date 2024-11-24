@@ -17,28 +17,26 @@ ReviewRouter.get('/:productId', async (req: Request, res: Response): Promise<voi
   }
 });
 
-// Check if the user has purchased the product
 ReviewRouter.get('/hasBought/:productId', authenticateToken, async (req: Request, res: Response): Promise<void> => {
   const userId: string = req.user_id;
   const { productId } = req.params;
 
   try {
     const orders = await Orders.find({ user_id: userId }).select('_id');
-    const orderIds = orders.map(order => order._id); // Extract order IDs
+    const orderIds = orders.map(order => order._id);
 
     const orderItem = await OrderItems.findOne({
       product_id: productId,
       order_id: { $in: orderIds },
     });
 
-    res.json(!!orderItem); // Return true if order item exists, otherwise false
+    res.json(!!orderItem);
   } catch (error) {
     console.error('Error checking purchase status:', error);
     res.status(500).json({ message: 'Error checking purchase status' });
   }
 });
 
-// Post a review for a product
 ReviewRouter.post('/:productId', authenticateToken, async (req: Request, res: Response): Promise<void> => {
   const userId: string = req.user_id;
   const { productId } = req.params;
