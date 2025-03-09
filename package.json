@@ -2,27 +2,25 @@
   "name": "handlecore",
   "version": "1.0.0",
   "description": "",
-  "main": "index.ts",
-  "type": "module",
+  "main": "dist/index.js",
   "scripts": {
-    "start": "npx tsx --env-file=.env --watch index.ts"
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts"
   },
-  "author": "",
+  "author": "hashnj",
   "license": "ISC",
   "dependencies": {
     "axios": "^1.7.9",
     "bcrypt": "^5.1.1",
     "cookie-parser": "^1.4.7",
-    "cookieparser": "^0.1.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.1",
-    "fs": "^0.0.1-security",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.7.2",
     "nodemon": "^3.1.7",
     "stripe": "^17.7.0",
-    "tsc": "^2.0.4",
     "zod": "^3.23.8"
   },
   "devDependencies": {
