@@ -1,7 +1,7 @@
 import express from 'express'
 import { connectDB } from './db';
 import authRouter from './routes/auth'
-import { B_PORT } from './config';
+import { B_PORT, F_URL } from './config';
 import ProductRouter from './routes/product';
 import categoryRouter from './routes/category';
 import OrderRouter from './routes/order';
@@ -18,7 +18,7 @@ connectDB();
 
 app.use(cookieParser());
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: F_URL,
   credentials: true,
 }));
 app.use(express.json());
