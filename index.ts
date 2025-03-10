@@ -6,7 +6,6 @@ import ProductRouter from './routes/product';
 import categoryRouter from './routes/category';
 import OrderRouter from './routes/order';
 import ReviewRouter from './routes/review';
-
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import CartRouter from './routes/cart';
@@ -17,18 +16,12 @@ const app = express();
 connectDB();
 
 const allowedOrigins = [
-  'http://localhost:5173', // Local frontend
-  'https://corecart.vercel.app', // Production frontend
+  'http://localhost:5173',
+  'https://corecart.vercel.app',
 ];
 
 app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: allowedOrigins,
   credentials: true,
 }));
 
@@ -43,14 +36,12 @@ app.use('/wishlist', wishlistRouter);
 app.use('/reviews', ReviewRouter);
 app.use('/order', OrderRouter);
 
-// Global error handler
 app.use((err: any, _req: express.Request, res: express.Response, next: express.NextFunction) => {
   console.error(err.stack);
   res.status(500).send('Something went wrong!');
 });
 
 const PORT = B_PORT;
-
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });

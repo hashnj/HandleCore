@@ -5,12 +5,11 @@ import { Users, User } from '../models/Users';
 import { JwtSecret } from '../config';
 import jwt from 'jsonwebtoken';
 import { hashPassword, verifyPassword } from '../utils/password'; 
-import auth from '../middleware/auth'
+import auth from '../middleware/auth';
 
 const authRouter: Router = express.Router();
 
-
-authRouter.post('/signin', async (req: Request, res: Response):Promise<any>=> {
+authRouter.post('/signin', async (req: Request, res: Response): Promise<any> => {
   const { body } = req;
 
   const validationResult = validLogin.safeParse(body);
@@ -36,14 +35,14 @@ authRouter.post('/signin', async (req: Request, res: Response):Promise<any>=> {
     res.cookie('token', token, {
       httpOnly: true,
       secure: true,
-      sameSite: 'strict',
+      sameSite: 'none',
     });
 
     res.status(200).json({
-      username:user.userName,
-      email:user.email,
-      address:user.addresses,
-      role:user.role
+      username: user.userName,
+      email: user.email,
+      address: user.addresses,
+      role: user.role,
     });
   } catch (error) {
     console.error('Error during sign-in:', error);
@@ -51,9 +50,7 @@ authRouter.post('/signin', async (req: Request, res: Response):Promise<any>=> {
   }
 });
 
-
-
-authRouter.post('/signup', async (req: Request, res: Response): Promise<any>=> {
+authRouter.post('/signup', async (req: Request, res: Response): Promise<any> => {
   const { body } = req;
 
   const validationResult = validRegister.safeParse(body);
@@ -61,8 +58,7 @@ authRouter.post('/signup', async (req: Request, res: Response): Promise<any>=> {
     return res.status(400).json({ errors: validationResult.error.errors });
   }
 
-  const { userName, address1, city, state, postalCode, email, password } =
-    validationResult.data;
+  const { userName, address1, city, state, postalCode, email, password } = validationResult.data;
 
   try {
     const exists: User | null = await Users.findOne({ email });
@@ -87,7 +83,7 @@ authRouter.post('/signup', async (req: Request, res: Response): Promise<any>=> {
     res.cookie('token', token, {
       httpOnly: true,
       secure: true,
-      sameSite: 'strict',
+      sameSite: 'none',
     });
 
     res.status(201).json({ message: 'User registered successfully' });
@@ -97,25 +93,26 @@ authRouter.post('/signup', async (req: Request, res: Response): Promise<any>=> {
   }
 });
 
-authRouter.post('/', auth ,async(req:Request,res:Response) => {
-  const userId= req.user_id;
-  const user : User | null = await Users.findById(userId);
-  // console.log(user);
-  if(user){
-  res.status(200).json({
-    username:user.userName,
-    email:user.email,
-    address:user.addresses,
-    role:user.role
-  });
+authRouter.post('/', auth, async (req: Request, res: Response) => {
+  const userId = req.user_id;
+  const user: User | null = await Users.findById(userId);
+  if (user) {
+    res.status(200).json({
+      username: user.userName,
+      email: user.email,
+      address: user.addresses,
+      role: user.role,
+    });
   }
-})
-
-authRouter.post('/logout', auth, async (req:Request, res:Response):Promise<any> => {
-  console.log('reached logout')
-  res.clearCookie('token');
-  return res.status(200).json({ message: 'Logged out successfully' });
 });
 
+authRouter.post('/logout', auth, async (_req: Request, res: Response): Promise<any> => {
+  res.clearCookie('token', {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'none',
+  });
+  return res.status(200).json({ message: 'Logged out successfully' });
+});
 
 export default authRouter;
